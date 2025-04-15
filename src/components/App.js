@@ -25,7 +25,7 @@ const initialFriends = [
 
 function Button({ children, onClick }) {
   return <button className="button" onClick={onClick}>{children}</button>;
-}
+};
 
 
 export default function App() {
@@ -35,6 +35,7 @@ export default function App() {
 
   function handleShowAdd() {
     setShowAddFriend(show => !show);
+    setSelectedFriend(null);
   };
 
   function handleAddFriend(friend) {
