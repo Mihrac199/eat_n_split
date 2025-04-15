@@ -24,14 +24,14 @@ const initialFriends = [
 
 
 function Button({ children, onClick }) {
-  return <button className="button" onClick={onClick}>{children}</button>
-};
+  return <button className="button" onClick={onClick}>{children}</button>;
+}
 
 
 export default function App() {
-
   const [friends, setFriends] = useState(initialFriends);
   const [showAddFriend, setShowAddFriend] = useState(false);
+  const [selectedFriend, setSelectedFriend] = useState(null);
 
   function handleShowAdd() {
     setShowAddFriend(show => !show);
@@ -39,7 +39,11 @@ export default function App() {
 
   function handleAddFriend(friend) {
     setFriends(friends => [...friends, friend]);
+    setShowAddFriend(false);
+  };
 
+  function handleSelection(friend) {
+    setSelectedFriend(selected => selected?.id === friend.id ? null : friend);
     setShowAddFriend(false);
   };
 
@@ -49,15 +53,25 @@ export default function App() {
 
       <div className="sidebar">
 
-        <FriendsList $friends={friends} />
+        <FriendsList
+          friends={friends}
+          handleSelection={handleSelection}
+          selectedFriend={selectedFriend}
+        />
 
-        {showAddFriend && <FormAddFriend $handleAddFriend={handleAddFriend} />}
+        {showAddFriend && (
+          <FormAddFriend handleAddFriend={handleAddFriend} />
+        )}
 
-        <Button onClick={handleShowAdd}>{showAddFriend ? "Close" : "Add Friend"}</Button>
+        <Button onClick={handleShowAdd}>
+          {showAddFriend ? "Close" : "Add Friend"}
+        </Button>
 
       </div>
 
-      <FormSplitBill />
+      {selectedFriend && (
+        <FormSplitBill selectedFriend={selectedFriend} />
+      )}
 
     </div>
 
@@ -66,14 +80,21 @@ export default function App() {
 };
 
 
-function FriendsList({ $friends }) {
+function FriendsList({ friends, handleSelection, selectedFriend }) {
 
   return (
 
     <ul>
-      {$friends.map(friend => (
-        <Friend friend={friend} key={friend.id} />
+
+      {friends.map(friend => (
+        <Friend
+          friend={friend}
+          key={friend.id}
+          handleSelection={handleSelection}
+          selectedFriend={selectedFriend}
+        />
       ))}
+
     </ul>
 
   );
@@ -81,29 +102,37 @@ function FriendsList({ $friends }) {
 };
 
 
-function Friend({ friend }) {
+function Friend({ friend, handleSelection, selectedFriend }) {
+
+  const isSelected = friend.id === selectedFriend?.id;
 
   return (
 
-    <li>
+    <li className={isSelected ? "selected" : null}>
 
       <img src={friend.image} alt={friend.name} />
 
       <h3>{friend.name}</h3>
 
-      {friend.balance < 0 &&
-        <p className="red">You owe {friend.name} {Math.abs(friend.balance)}₺</p> /* Borçlusun */
-      }
+      {friend.balance < 0 && (
+        <p className="red">
+          You owe {friend.name} {Math.abs(friend.balance)}₺
+        </p>
+      )}
 
-      {friend.balance > 0 &&
-        <p className="green">{friend.name} owes you {friend.balance}₺</p> /* Alacaklısın */
-      }
+      {friend.balance > 0 && (
+        <p className="green">
+          {friend.name} owes you {friend.balance}₺
+        </p>
+      )}
 
-      {friend.balance === 0 &&
+      {friend.balance === 0 && (
         <p>You and {friend.name} are even</p>
-      }
+      )}
 
-      <Button>Select</Button>
+      <Button onClick={() => handleSelection(friend)}>
+        {isSelected ? "Close" : "Select"}
+      </Button>
 
     </li>
 
@@ -112,7 +141,7 @@ function Friend({ friend }) {
 };
 
 
-function FormAddFriend({ $handleAddFriend }) {
+function FormAddFriend({ handleAddFriend }) {
 
   const [name, setName] = useState("");
   const [image, setImage] = useState("https://i.pravatar.cc/48");
@@ -125,15 +154,16 @@ function FormAddFriend({ $handleAddFriend }) {
     const id = Date.now();
 
     const newFriend = {
-      id, name, image: `${image}?u=${id}`, balance: 0
+      id,
+      name,
+      image: `${image}?u=${id}`,
+      balance: 0,
     };
 
-    console.log(newFriend);
-
-    $handleAddFriend(newFriend);
+    handleAddFriend(newFriend);
 
     setName("");
-    setImage("https://i.pravatar.cc/48")
+    setImage("https://i.pravatar.cc/48");
   };
 
   return (
@@ -141,10 +171,18 @@ function FormAddFriend({ $handleAddFriend }) {
     <form className="form-add-friend" onSubmit={handleSubmit}>
 
       <label>► Friend name</label>
-      <input type="text" value={name} onChange={(e) => setName(e.target.value)} />
+      <input
+        type="text"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+      />
 
       <label>► Image URL</label>
-      <input type="text" value={image} onChange={(e) => setImage(e.target.value)} />
+      <input
+        type="text"
+        value={image}
+        onChange={(e) => setImage(e.target.value)}
+      />
 
       <Button>Add</Button>
 
@@ -155,13 +193,13 @@ function FormAddFriend({ $handleAddFriend }) {
 };
 
 
-function FormSplitBill() {
+function FormSplitBill({ selectedFriend }) {
 
   return (
 
     <form className="form-split-bill">
 
-      <h2>Split a bill X</h2>
+      <h2>Split a bill with {selectedFriend.name}</h2>
 
       <label>► Bill value</label>
       <input type="text" />
@@ -169,16 +207,17 @@ function FormSplitBill() {
       <label>► Your expense</label>
       <input type="text" />
 
-      <label>► X expense</label>
+      <label>► {selectedFriend.name}'s expense</label>
       <input type="text" disabled />
 
-      <label>► Who is playing the bill</label>
+      <label>► Who is paying the bill</label>
       <select>
         <option value="user">You</option>
-        <option value="friend">X</option>
+        <option value="friend">{selectedFriend.name}</option>
       </select>
 
     </form>
+
   );
 
 };
