@@ -1,3 +1,7 @@
-# Eat N Split Project (React)
+# Eat N Split Project
 
-Calculate and divide expenses.
+Used Technologies;
+
+      1) CSS 3 
+      2) React
+          - Create React App

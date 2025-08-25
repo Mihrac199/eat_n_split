@@ -1,9 +1,9 @@
-import { useState } from "react";
-import { Button } from "./_element";
-import { initialFriends } from "./_config";
-import FriendsList from "./FriendsList";
-import FormAddFriend from "./FormAddFriend";
-import FormSplitBill from "./FormSplitBill";
+import { useState } from "react"
+import { Button } from "./_element"
+import { initialFriends } from "./_config"
+import FriendsList from "./FriendsList"
+import FormAddFriend from "./FormAddFriend"
+import FormSplitBill from "./FormSplitBill"
 
 
 export default function App() {

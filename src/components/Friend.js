@@ -1,4 +1,4 @@
-import { Button } from "./_element";
+import { Button } from "./_element"
 
 
 export default function Friend({ friend, handleSelection, selectedFriend }) {
